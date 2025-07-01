@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- For development only -->
-    <domain-config cleartextTrafficPermitted="true">
+
+    <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">fruitoftek.com</domain>
     </domain-config>
 

@@ -17,6 +17,7 @@ import android.view.View
 import java.net.SocketTimeoutException
 
 import com.jacob.fruitoftek.kotlinschoolmanagement.network.*
+import de.hdodenhof.circleimageview.BuildConfig
 import java.io.IOException
 
 class RegisterActivity : AppCompatActivity() {
@@ -63,7 +64,9 @@ class RegisterActivity : AppCompatActivity() {
         )
 
         showLoading(true)
-        Log.d(TAG, "Attempting registration for: ${request.email}")
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "Attempting registration for: ${request.email}")
+        }
 
         RetrofitClient.instance.registerUser(request)
             .enqueue(object : Callback<ApiResponse> {
@@ -72,14 +75,16 @@ class RegisterActivity : AppCompatActivity() {
                     val raw = response.raw()
                     val bodyString = response.errorBody()?.string()
 
-                    Log.d(TAG, "Raw response: $raw")
-                    Log.d(TAG, "Error body: $bodyString")
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "Raw response: $raw")
+                        Log.d(TAG, "Error body: $bodyString")
+                    }
 
                     try {
                         if (response.isSuccessful && response.body() != null) {
                             handleRegistrationResponse(response.body()!!)
                         } else {
-                            showError("Server error: $bodyString")
+                            handleErrorResponse(response)
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "Exception parsing response", e)
@@ -97,16 +102,22 @@ class RegisterActivity : AppCompatActivity() {
     private fun handleRegistrationResponse(apiResponse: ApiResponse) {
         when {
             apiResponse.status.equals("success", ignoreCase = true) -> {
-                Log.i(TAG, "Registration successful")
+                if (BuildConfig.DEBUG) {
+                    Log.i(TAG, "Registration successful")
+                }
                 showSuccess("Registration successful! Please login.")
                 finish()
             }
             !apiResponse.message.isNullOrEmpty() -> {
-                Log.w(TAG, "Registration failed: ${apiResponse.message}")
+                if (BuildConfig.DEBUG) {
+                    Log.w(TAG, "Registration failed: ${apiResponse.message}")
+                }
                 showError(apiResponse.message)
             }
             else -> {
-                Log.w(TAG, "Unexpected success response: $apiResponse")
+                if (BuildConfig.DEBUG) {
+                    Log.w(TAG, "Unexpected success response: $apiResponse")
+                }
                 showError("Unexpected server response")
             }
         }
@@ -121,6 +132,9 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         Log.e(TAG, "Registration failed. Code: $errorCode, Body: $errorBody")
+        if (BuildConfig.DEBUG) {
+            Log.e(TAG, "Registration failed. Code: $errorCode, Body: $errorBody")
+        }
 
         when (errorCode) {
             400 -> showError("Invalid request: $errorBody")

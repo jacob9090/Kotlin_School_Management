@@ -5,12 +5,4 @@
         <domain includeSubdomains="true">fruitoftek.com</domain>
     </domain-config>
 
-    <!-- For production - use this instead -->
-<!--    <domain-config>-->
-<!--        <domain includeSubdomains="true">fruitoftek.com</domain>-->
-<!--        <trust-anchors>-->
-<!--            <certificates src="@raw/your_certificate"/>-->
-<!--        </trust-anchors>-->
-<!--    </domain-config>-->
-
 </network-security-config>

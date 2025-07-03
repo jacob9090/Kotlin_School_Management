@@ -20,4 +20,18 @@ class StudentRepository(
         api.addOrUpdateStudent(student) // Upsert to server
         dao.insertStudent(student)      // Update local DB
     }
+
+    // Push all local data to the server then refresh from the API
+    suspend fun syncStudents() {
+        val local = dao.getAllStudentsList()
+        for (student in local) {
+            try {
+                addOrUpdateStudent(student)
+            } catch (e: Exception) {
+                // If any push fails, rethrow to trigger retry
+                throw e
+            }
+        }
+        refreshStudentsFromServer()
+    }
 }

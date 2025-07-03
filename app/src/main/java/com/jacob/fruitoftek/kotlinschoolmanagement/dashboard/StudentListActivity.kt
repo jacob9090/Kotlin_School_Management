@@ -12,6 +12,13 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+import androidx.work.WorkManager
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.ExistingWorkPolicy
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import com.jacob.fruitoftek.kotlinschoolmanagement.model.StudentSyncWorker
+
 class StudentListActivity : ComponentActivity() {
     private lateinit var adapter: StudentAdapter
 
@@ -27,6 +34,18 @@ class StudentListActivity : ComponentActivity() {
         val dao = AppDatabase.getDatabase(this).studentDao()
         val api = RetrofitClient.instance
         val repo = StudentRepository(dao, api)
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val work = OneTimeWorkRequestBuilder<StudentSyncWorker>()
+            .setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(this).enqueueUniqueWork(
+            "student_sync",
+            ExistingWorkPolicy.KEEP,
+            work
+        )
 
         repo.allStudents.observe(this) { students ->
             adapter.setStudents(students)

@@ -52,6 +52,9 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    // WorkManager for background sync
+    implementation(libs.androidx.work.ktx)
+
     // RecyclerView
     implementation ("androidx.recyclerview:recyclerview:1.4.0")
 

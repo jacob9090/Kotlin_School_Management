@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.jacob.fruitoftek.kotlinlogin", appContext.packageName)
+        assertEquals("com.jacob.fruitoftek.kotlinschoolmanagement", appContext.packageName)
     }
 }

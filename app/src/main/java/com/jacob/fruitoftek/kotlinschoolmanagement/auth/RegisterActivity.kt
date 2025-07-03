@@ -17,7 +17,7 @@ import android.view.View
 import java.net.SocketTimeoutException
 
 import com.jacob.fruitoftek.kotlinschoolmanagement.network.*
-import de.hdodenhof.circleimageview.BuildConfig
+import com.jacob.fruitoftek.kotlinschoolmanagement.BuildConfig
 import java.io.IOException
 
 class RegisterActivity : AppCompatActivity() {

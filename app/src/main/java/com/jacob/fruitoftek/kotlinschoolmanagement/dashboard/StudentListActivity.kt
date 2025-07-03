@@ -8,7 +8,7 @@ import com.jacob.fruitoftek.kotlinschoolmanagement.R
 import com.jacob.fruitoftek.kotlinschoolmanagement.model.AppDatabase
 import com.jacob.fruitoftek.kotlinschoolmanagement.model.StudentRepository
 import com.jacob.fruitoftek.kotlinschoolmanagement.network.RetrofitClient
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -25,14 +25,14 @@ class StudentListActivity : ComponentActivity() {
         recyclerView.adapter = adapter
 
         val dao = AppDatabase.getDatabase(this).studentDao()
-        val api = RetrofitClient.instance  // <-- FIXED LINE
+        val api = RetrofitClient.instance
         val repo = StudentRepository(dao, api)
 
         repo.allStudents.observe(this) { students ->
             adapter.setStudents(students)
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 repo.refreshStudentsFromServer()
             } catch (e: Exception) {

@@ -20,6 +20,12 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import com.jacob.fruitoftek.kotlinschoolmanagement.dashboard.DashboardActivity
 
+import android.net.ConnectivityManager
+import android.content.Context
+import android.view.View
+import com.jacob.fruitoftek.kotlinschoolmanagement.model.User
+import com.jacob.fruitoftek.kotlinschoolmanagement.network.UserDetailsRequest
+
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
@@ -67,16 +73,38 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = connectivityManager.activeNetworkInfo
+            if (networkInfo == null || !networkInfo.isConnected) {
+                Toast.makeText(this, "No internet connection", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
             val request = LoginRequest(email = email, password = password)
+            binding.progressBarLogin.visibility = View.VISIBLE
+            binding.btnLogin.isEnabled = false
 
             RetrofitClient.instance.loginUser(request)
                 .enqueue(object : Callback<ApiResponse> {
                     override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
                         if (response.isSuccessful && response.body()?.user != null) {
-                            SharedPrefManager.getInstance(applicationContext)
-                                .saveUser(response.body()!!.user!!)
-                            startActivity(Intent(applicationContext, DashboardActivity::class.java))
-                            finish()
+                            val loginUser = response.body()!!.user!!
+                            val detailsRequest = UserDetailsRequest(user_id = loginUser.id)
+                            RetrofitClient.instance.getUserDetails(detailsRequest)
+                                .enqueue(object : Callback<User> {
+                                    override fun onResponse(call: Call<User>, detailResponse: Response<User>) {
+                                        val detailedUser = detailResponse.body() ?: loginUser
+                                        SharedPrefManager.getInstance(applicationContext).saveUser(detailedUser)
+                                        startActivity(Intent(applicationContext, DashboardActivity::class.java))
+                                        finish()
+                                    }
+
+                                    override fun onFailure(call: Call<User>, t: Throwable) {
+                                        SharedPrefManager.getInstance(applicationContext).saveUser(loginUser)
+                                        startActivity(Intent(applicationContext, DashboardActivity::class.java))
+                                        finish()
+                                    }
+                                })
                         } else {
                             Toast.makeText(
                                 applicationContext,

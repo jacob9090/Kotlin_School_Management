@@ -26,7 +26,7 @@ class DashboardActivity : AppCompatActivity() {
         }
 
         // Set user info
-        binding.userFNameTv.text = user.firstName  // or user.fname if that's the property
+        binding.userFNameTv.text = user.firstName
         binding.userEmailTv.text = user.email
 
         binding.userProfileIv.setOnClickListener {

@@ -36,9 +36,5 @@ class DashboardActivity : AppCompatActivity() {
         binding.viewStudentCv.setOnClickListener {
             startActivity(Intent(this, StudentListActivity::class.java))
         }
-
-//        supportFragmentManager.beginTransaction()
-//            .replace(binding.fragmentContainer.id, UserProfileFragment.newInstance(user))
-//            .commit()
     }
 }

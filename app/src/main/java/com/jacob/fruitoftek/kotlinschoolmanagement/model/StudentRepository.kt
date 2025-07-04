@@ -1,11 +1,14 @@
 package com.jacob.fruitoftek.kotlinschoolmanagement.model
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import com.jacob.fruitoftek.kotlinschoolmanagement.network.ApiService
+import androidx.work.*
 
 class StudentRepository(
     private val dao: StudentDao,
-    private val api: ApiService
+    private val api: ApiService,
+    private val context: Context
 ) {
     val allStudents: LiveData<List<Student>> = dao.getAllStudents()
 
@@ -17,8 +20,23 @@ class StudentRepository(
     }
 
     suspend fun addOrUpdateStudent(student: Student) {
-        api.addOrUpdateStudent(student) // Upsert to server
-        dao.insertStudent(student)      // Update local DB
+        try {
+            api.addOrUpdateStudent(student) // Upsert to server
+        } catch (_: Exception) {
+            // Ignore network errors; worker will retry when online
+        }
+        dao.insertStudent(student)
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val work = OneTimeWorkRequestBuilder<StudentSyncWorker>()
+            .setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "student_sync",
+            ExistingWorkPolicy.KEEP,
+            work
+        )
     }
 
     // Push all local data to the server then refresh from the API

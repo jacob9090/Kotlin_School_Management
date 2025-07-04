@@ -33,7 +33,7 @@ class StudentListActivity : ComponentActivity() {
 
         val dao = AppDatabase.getDatabase(this).studentDao()
         val api = RetrofitClient.instance
-        val repo = StudentRepository(dao, api)
+        val repo = StudentRepository(dao, api, this)
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

@@ -11,7 +11,7 @@ class StudentSyncWorker(
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val db = AppDatabase.getDatabase(applicationContext)
-        val repo = StudentRepository(db.studentDao(), RetrofitClient.instance)
+        val repo = StudentRepository(db.studentDao(), RetrofitClient.instance, applicationContext)
         return try {
             repo.syncStudents()
             Result.success()

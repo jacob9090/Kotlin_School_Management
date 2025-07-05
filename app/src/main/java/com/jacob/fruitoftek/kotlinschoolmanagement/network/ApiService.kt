@@ -2,6 +2,7 @@ package com.jacob.fruitoftek.kotlinschoolmanagement.network
 
 import com.jacob.fruitoftek.kotlinschoolmanagement.model.ApiResponse
 import com.jacob.fruitoftek.kotlinschoolmanagement.model.Student
+import com.jacob.fruitoftek.kotlinschoolmanagement.model.StudentDao
 import com.jacob.fruitoftek.kotlinschoolmanagement.model.User
 import retrofit2.Call
 import retrofit2.http.Body
@@ -19,7 +20,7 @@ interface ApiService {
     fun getUserDetails(@Body request: UserDetailsRequest): Call<User>
 
     @GET("students")
-    suspend fun getStudents(): List<Student>
+    suspend fun getStudents(): List<StudentDao>
 
     @POST("students/upsert")
     suspend fun addOrUpdateStudent(@Body student: Student): Student
